@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
@@ -34,7 +33,7 @@ public record UpgradeData(Map<Holder<UpgradeOrbType>, Integer> upgrades, String 
 
     public static final Codec<UpgradeData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf(SLOT).forGetter(UpgradeData::getUpgradedSlot),
-            Codec.unboundedMap(UpgradeOrbTypeRegistry.UPGRADE_ORB_REGISTRY_CODEC,Codec.INT).fieldOf(UPGRADES).forGetter(UpgradeData::upgrades)
+            Codec.unboundedMap(UpgradeOrbTypeRegistry.UPGRADE_ORB_REGISTRY_CODEC, Codec.INT).fieldOf(UPGRADES).forGetter(UpgradeData::upgrades)
     ).apply(builder, (slot, list) -> new UpgradeData(list, slot)));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, UpgradeData> STREAM_CODEC = StreamCodec.of(
@@ -44,7 +43,7 @@ public record UpgradeData(Map<Holder<UpgradeOrbType>, Integer> upgrades, String 
                 buf.writeInt(entries.size());
                 for (Map.Entry<Holder<UpgradeOrbType>, Integer> entry : entries) {
                     if (entry.getKey().getKey() != null) {
-                        buf.writeUtf(entry.getKey().getKey().toString());
+                        buf.writeResourceLocation(entry.getKey().getKey().location());
                         buf.writeInt(entry.getValue());
                     }
                 }
@@ -55,7 +54,7 @@ public record UpgradeData(Map<Holder<UpgradeOrbType>, Integer> upgrades, String 
                 int i = buf.readInt();
                 ImmutableMap.Builder<Holder<UpgradeOrbType>, Integer> upgrades = ImmutableMap.builder();
                 for (int j = 0; j < i; j++) {
-                    var upgradeKey = ResourceLocation.parse(buf.readUtf());
+                    var upgradeKey = buf.readResourceLocation();
                     int c = buf.readInt();
                     Optional.ofNullable(registry.get(upgradeKey)).ifPresent((upgrade) -> upgrades.put(registry.wrapAsHolder(upgrade), c));
                 }

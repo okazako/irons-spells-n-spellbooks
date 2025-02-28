@@ -32,50 +32,49 @@ public class UpgradeOrbTypeRegistry {
         event.dataPackRegistry(UPGRADE_ORB_REGISTRY_KEY, UpgradeOrbType.CODEC, UpgradeOrbType.CODEC);
     }
 
-    public static Holder<UpgradeOrbType> FIRE_SPELL_POWER;
-    public static Holder<UpgradeOrbType> ICE_SPELL_POWER;
-    public static Holder<UpgradeOrbType> LIGHTNING_SPELL_POWER;
-    public static Holder<UpgradeOrbType> HOLY_SPELL_POWER;
-    public static Holder<UpgradeOrbType> ENDER_SPELL_POWER;
-    public static Holder<UpgradeOrbType> BLOOD_SPELL_POWER;
-    public static Holder<UpgradeOrbType> EVOCATION_SPELL_POWER;
-    public static Holder<UpgradeOrbType> NATURE_SPELL_POWER;
-    public static Holder<UpgradeOrbType> COOLDOWN;
-    public static Holder<UpgradeOrbType> SPELL_RESISTANCE;
-    public static Holder<UpgradeOrbType> MANA;
-    public static Holder<UpgradeOrbType> ATTACK_DAMAGE;
-    public static Holder<UpgradeOrbType> ATTACK_SPEED;
-    public static Holder<UpgradeOrbType> HEALTH;
-    ;
+    public static ResourceKey<UpgradeOrbType> FIRE_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("fire_power"));
+    public static ResourceKey<UpgradeOrbType> ICE_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("ice_power"));
+    public static ResourceKey<UpgradeOrbType> LIGHTNING_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("lightning_power"));
+    public static ResourceKey<UpgradeOrbType> HOLY_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("holy_power"));
+    public static ResourceKey<UpgradeOrbType> ENDER_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("ender_power"));
+    public static ResourceKey<UpgradeOrbType> BLOOD_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("blood_power"));
+    public static ResourceKey<UpgradeOrbType> EVOCATION_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("evocation_power"));
+    public static ResourceKey<UpgradeOrbType> NATURE_SPELL_POWER = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("nature_power"));
+    public static ResourceKey<UpgradeOrbType> COOLDOWN = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("cooldown"));
+    public static ResourceKey<UpgradeOrbType> SPELL_RESISTANCE = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("spell_resistance"));
+    public static ResourceKey<UpgradeOrbType> MANA = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("mana"));
+    public static ResourceKey<UpgradeOrbType> ATTACK_DAMAGE = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("melee_damage"));
+    public static ResourceKey<UpgradeOrbType> ATTACK_SPEED = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("melee_speed"));
+    public static ResourceKey<UpgradeOrbType> HEALTH = ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("health"));
 
     public static void bootstrap(BootstrapContext<UpgradeOrbType> bootstrap) {
-        FIRE_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("fire_power")),
+        bootstrap.register(FIRE_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.FIRE_SPELL_POWER, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.FIRE_UPGRADE_ORB)));
-        ICE_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("ice_power")),
+        bootstrap.register(ICE_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.ICE_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.ICE_UPGRADE_ORB)));
-        LIGHTNING_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("lightning_power")),
+        bootstrap.register(LIGHTNING_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.LIGHTNING_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.LIGHTNING_UPGRADE_ORB)));
-        HOLY_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("holy_power")),
+        bootstrap.register(HOLY_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.HOLY_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.HOLY_UPGRADE_ORB)));
-        ENDER_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("ender_power")),
+        bootstrap.register(ENDER_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.ENDER_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.ENDER_UPGRADE_ORB)));
-        BLOOD_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("blood_power")),
+        bootstrap.register(BLOOD_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.BLOOD_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.BLOOD_UPGRADE_ORB)));
-        EVOCATION_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("evocation_power")),
+        bootstrap.register(EVOCATION_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.EVOCATION_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.EVOCATION_UPGRADE_ORB)));
-        NATURE_SPELL_POWER = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("nature_power")),
+        bootstrap.register(NATURE_SPELL_POWER,
                 new UpgradeOrbType(AttributeRegistry.NATURE_SPELL_POWER, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.NATURE_UPGRADE_ORB)));
-        COOLDOWN = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("cooldown")),
+        bootstrap.register(COOLDOWN,
                 new UpgradeOrbType(AttributeRegistry.COOLDOWN_REDUCTION, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.COOLDOWN_UPGRADE_ORB)));
-        SPELL_RESISTANCE = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("spell_resistance")),
+        bootstrap.register(SPELL_RESISTANCE,
                 new UpgradeOrbType(AttributeRegistry.SPELL_RESIST, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.of(ItemRegistry.PROTECTION_UPGRADE_ORB)));
-        MANA = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("mana")),
+        bootstrap.register(MANA,
                 new UpgradeOrbType(AttributeRegistry.MAX_MANA, 50, AttributeModifier.Operation.ADD_VALUE, Optional.of(ItemRegistry.MANA_UPGRADE_ORB)));
-        ATTACK_DAMAGE = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("melee_damage")),
+        bootstrap.register(ATTACK_DAMAGE,
                 new UpgradeOrbType(Attributes.ATTACK_DAMAGE, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.empty()));
-        ATTACK_SPEED = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("melee_speed")),
+        bootstrap.register(ATTACK_SPEED,
                 new UpgradeOrbType(Attributes.ATTACK_SPEED, .05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, Optional.empty()));
-        HEALTH = bootstrap.register(ResourceKey.create(UPGRADE_ORB_REGISTRY_KEY, IronsSpellbooks.id("health")),
+        bootstrap.register(HEALTH,
                 new UpgradeOrbType(Attributes.MAX_HEALTH, 2, AttributeModifier.Operation.ADD_VALUE, Optional.empty()));
     }
 }

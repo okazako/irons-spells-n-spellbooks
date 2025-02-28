@@ -139,11 +139,14 @@ public class ArcaneAnvilMenu extends ItemCombinerMenu {
             }
             //Upgrade System
             else if (Utils.canBeUpgraded(baseItemStack) && UpgradeData.getUpgradeData(baseItemStack).getTotalUpgrades() < ServerConfigs.MAX_UPGRADES.get() && modifierItemStack.has(ComponentRegistry.UPGRADE_ORB_TYPE)) {
-                var upgradeOrb = modifierItemStack.get(ComponentRegistry.UPGRADE_ORB_TYPE);
-                result = baseItemStack.copy();
-                String slot = UpgradeUtils.getRelevantEquipmentSlot(result);
-                UpgradeData.getUpgradeData(result).addUpgrade(result, upgradeOrb, slot);
-                //IronsSpellbooks.LOGGER.debug("ArcaneAnvilMenu: upgrade system test: total upgrades on {}: {}", result.getDisplayName().getString(), UpgradeUtils.getUpgradeCount(result));
+                var upgradeKey = modifierItemStack.get(ComponentRegistry.UPGRADE_ORB_TYPE);
+                var holderopt = this.player.registryAccess().holder(upgradeKey);
+                if(holderopt.isPresent()){
+                    var upgradeOrb = holderopt.get();
+                    result = baseItemStack.copy();
+                    String slot = UpgradeUtils.getRelevantEquipmentSlot(result);
+                    UpgradeData.getUpgradeData(result).addUpgrade(result, upgradeOrb, slot);
+                }
             }
             //Shriving Stone
             else if (modifierItemStack.is(ItemRegistry.SHRIVING_STONE.get())) {
