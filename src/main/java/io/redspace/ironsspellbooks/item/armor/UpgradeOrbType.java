@@ -10,18 +10,18 @@ import net.minecraft.world.item.Item;
 
 import java.util.Optional;
 
-public record UpgradeOrbData(
+public record UpgradeOrbType(
         Holder<Attribute> attribute,
         double amount,
         AttributeModifier.Operation operation,
         Optional<Holder<Item>> containerItem
 ) {
-    public static final Codec<UpgradeOrbData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(UpgradeOrbData::attribute),
-            Codec.DOUBLE.fieldOf("amount").forGetter(UpgradeOrbData::amount),
-            AttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(UpgradeOrbData::operation),
-            BuiltInRegistries.ITEM.holderByNameCodec().optionalFieldOf("containerItem").forGetter(UpgradeOrbData::containerItem)
-    ).apply(builder, UpgradeOrbData::new));
+    public static final Codec<UpgradeOrbType> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+            BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(UpgradeOrbType::attribute),
+            Codec.DOUBLE.fieldOf("amount").forGetter(UpgradeOrbType::amount),
+            AttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(UpgradeOrbType::operation),
+            BuiltInRegistries.ITEM.holderByNameCodec().optionalFieldOf("containerItem").forGetter(UpgradeOrbType::containerItem)
+    ).apply(builder, UpgradeOrbType::new));
 
     @Override
     public int hashCode() {
@@ -34,6 +34,6 @@ public record UpgradeOrbData(
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof UpgradeOrbData other && attribute.equals(other.attribute) && amount == other.amount && operation == other.operation && containerItem.equals(other.containerItem);
+        return obj instanceof UpgradeOrbType other && attribute.equals(other.attribute) && amount == other.amount && operation == other.operation && containerItem.equals(other.containerItem);
     }
 }
