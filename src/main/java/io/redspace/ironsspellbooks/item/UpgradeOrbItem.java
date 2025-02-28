@@ -1,6 +1,8 @@
 package io.redspace.ironsspellbooks.item;
 
+import io.redspace.ironsspellbooks.item.armor.UpgradeOrbType;
 import io.redspace.ironsspellbooks.item.armor.UpgradeType;
+import io.redspace.ironsspellbooks.registries.ComponentRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -12,18 +14,18 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import java.util.List;
 
 public class UpgradeOrbItem extends Item {
-    private final UpgradeType upgrade;
     private final static Component TOOLTIP_HEADER = Component.translatable("tooltip.irons_spellbooks.upgrade_tooltip").withStyle(ChatFormatting.GRAY);
-    private final Component TOOLTIP_TEXT;
 
+    @Deprecated(forRemoval = true)
+    /**
+     * Upgrade Orb Types are now datadriven; UpgradeType interface is no longer supported. See {@link io.redspace.ironsspellbooks.registries.UpgradeOrbTypeRegistry} for datagenning custom orbs
+     */
     public UpgradeOrbItem(UpgradeType upgrade, Properties pProperties) {
-        super(pProperties);
-        this.upgrade = upgrade;
-        TOOLTIP_TEXT = Component.literal(" ").append(Component.translatable("attribute.modifier.plus." + upgrade.getOperation().id(), ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(upgrade.getAmountPerUpgrade() * (upgrade.getOperation() == AttributeModifier.Operation.ADD_VALUE ? 1 : 100)), Component.translatable(upgrade.getAttribute().value().getDescriptionId())).withStyle(ChatFormatting.BLUE));
+        this(pProperties);
     }
 
-    public UpgradeType getUpgradeType() {
-        return this.upgrade;
+    public UpgradeOrbItem(Properties pProperties) {
+        super(pProperties);
     }
 
     @Override
@@ -34,9 +36,16 @@ public class UpgradeOrbItem extends Item {
     @Override
     public void appendHoverText(ItemStack pStack, TooltipContext context, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         super.appendHoverText(pStack, context, pTooltipComponents, pIsAdvanced);
-        pTooltipComponents.add(Component.empty());
-        pTooltipComponents.add(TOOLTIP_HEADER);
-        pTooltipComponents.add(TOOLTIP_TEXT);
+        if (pStack.has(ComponentRegistry.UPGRADE_ORB_TYPE)) {
 
+            UpgradeOrbType upgrade = pStack.get(ComponentRegistry.UPGRADE_ORB_TYPE).value();
+            pTooltipComponents.add(Component.empty());
+            pTooltipComponents.add(TOOLTIP_HEADER);
+            var text =
+                    Component.literal(" ").append(Component.translatable("attribute.modifier.plus." + upgrade.operation().id(),
+                            ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(upgrade.amount() * (upgrade.operation() == AttributeModifier.Operation.ADD_VALUE ? 1 : 100)),
+                            Component.translatable(upgrade.attribute().value().getDescriptionId())).withStyle(ChatFormatting.BLUE));
+            pTooltipComponents.add(text);
+        }
     }
 }

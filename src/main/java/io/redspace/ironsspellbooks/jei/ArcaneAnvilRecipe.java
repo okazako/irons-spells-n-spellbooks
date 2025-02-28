@@ -6,7 +6,6 @@ import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.item.InkItem;
-import io.redspace.ironsspellbooks.item.UpgradeOrbItem;
 import io.redspace.ironsspellbooks.registries.ComponentRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import io.redspace.ironsspellbooks.util.UpgradeUtils;
@@ -90,7 +89,7 @@ public class ArcaneAnvilRecipe {
                 tuple.a.add(leftItem);
                 rightItem.forEach(upgradeStack -> {
                     var result = leftItem.copy();
-                    result.set(ComponentRegistry.UPGRADE_DATA, UpgradeData.NONE.addUpgrade(result, ((UpgradeOrbItem) upgradeStack.getItem()).getUpgradeType(), UpgradeUtils.getRelevantEquipmentSlot(leftItem)));
+                    result.set(ComponentRegistry.UPGRADE_DATA, UpgradeData.NONE.addUpgrade(result,upgradeStack.get(ComponentRegistry.UPGRADE_ORB_TYPE), UpgradeUtils.getRelevantEquipmentSlot(leftItem)));
                     tuple.b.add(upgradeStack);
                     tuple.c.add(result);
                 });

@@ -3,22 +3,23 @@ package io.redspace.ironsspellbooks.api.item;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsspellbooks.item.armor.UpgradeType;
+import io.redspace.ironsspellbooks.item.armor.UpgradeOrbType;
+import io.redspace.ironsspellbooks.registries.UpgradeOrbTypeRegistry;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.Holder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.redspace.ironsspellbooks.registries.ComponentRegistry.UPGRADE_DATA;
 
-public record UpgradeData(ImmutableMap<UpgradeType, Integer> upgrades, String upgradedSlot) {
+public record UpgradeData(Map<Holder<UpgradeOrbType>, Integer> upgrades, String upgradedSlot) {
     public static final String Upgrades = "ISBUpgrades";
     public static final String UPGRADE_TYPE = "id";
     public static final String SLOT = "slot";
@@ -33,57 +34,51 @@ public record UpgradeData(ImmutableMap<UpgradeType, Integer> upgrades, String up
 
     public static final Codec<UpgradeData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf(SLOT).forGetter(UpgradeData::getUpgradedSlot),
-            Codec.list(ELEMENT_CODEC).fieldOf(UPGRADES).forGetter((data) -> data.getUpgrades().entrySet().stream().map(entry -> new ObjectObjectImmutablePair<>(entry.getKey().getId().toString(), entry.getValue())).toList())
-    ).apply(builder, (slot, list) -> new UpgradeData(parseCodec(list), slot)));
+            Codec.unboundedMap(UpgradeOrbTypeRegistry.UPGRADE_ORB_REGISTRY_CODEC,Codec.INT).fieldOf(UPGRADES).forGetter(UpgradeData::upgrades)
+    ).apply(builder, (slot, list) -> new UpgradeData(list, slot)));
 
-    public static final StreamCodec<FriendlyByteBuf, UpgradeData> STREAM_CODEC = StreamCodec.of(
+    public static final StreamCodec<RegistryFriendlyByteBuf, UpgradeData> STREAM_CODEC = StreamCodec.of(
             (buf, data) -> {
                 buf.writeUtf(data.upgradedSlot);
                 var entries = data.upgrades.entrySet();
                 buf.writeInt(entries.size());
-                for (Map.Entry<UpgradeType, Integer> entry : entries) {
-                    buf.writeUtf(entry.getKey().getId().toString());
-                    buf.writeInt(entry.getValue());
+                for (Map.Entry<Holder<UpgradeOrbType>, Integer> entry : entries) {
+                    if (entry.getKey().getKey() != null) {
+                        buf.writeUtf(entry.getKey().getKey().toString());
+                        buf.writeInt(entry.getValue());
+                    }
                 }
             },
             (buf) -> {
+                var registry = UpgradeOrbTypeRegistry.upgradeTypeRegistry(buf.registryAccess());
                 String slot = buf.readUtf();
                 int i = buf.readInt();
-                ImmutableMap.Builder<UpgradeType, Integer> upgrades = ImmutableMap.builder();
+                ImmutableMap.Builder<Holder<UpgradeOrbType>, Integer> upgrades = ImmutableMap.builder();
                 for (int j = 0; j < i; j++) {
                     var upgradeKey = ResourceLocation.parse(buf.readUtf());
                     int c = buf.readInt();
-                    UpgradeType.getUpgrade(upgradeKey).ifPresent((upgrade) -> upgrades.put(upgrade, c));
+                    Optional.ofNullable(registry.get(upgradeKey)).ifPresent((upgrade) -> upgrades.put(registry.wrapAsHolder(upgrade), c));
                 }
                 return new UpgradeData(upgrades.build(), slot);
             }
     );
 
-    //TODO: this looks dirty
-    private static ImmutableMap<UpgradeType, Integer> parseCodec(List<ObjectObjectImmutablePair<String, Integer>> data) {
-        ImmutableMap.Builder<UpgradeType, Integer> map = ImmutableMap.builder();
-        for (Pair<String, Integer> pair : data) {
-            var upgradeKey = ResourceLocation.parse(pair.left());
-            UpgradeType.getUpgrade(upgradeKey).ifPresent((upgrade) -> map.put(upgrade, pair.right()));
-        }
-        return map.build();
-    }
-
     public static UpgradeData getUpgradeData(ItemStack itemStack) {
-        if (!itemStack.has(UPGRADE_DATA))
+        if (!itemStack.has(UPGRADE_DATA)) {
             return NONE;
+        }
         return itemStack.get(UPGRADE_DATA);
     }
 
-    public UpgradeData addUpgrade(ItemStack stack, UpgradeType upgradeType, String slot) {
+    public UpgradeData addUpgrade(ItemStack stack, Holder<UpgradeOrbType> upgradeType, String slot) {
         if (this == NONE) {
-            ImmutableMap.Builder<UpgradeType, Integer> map = ImmutableMap.builder();
+            ImmutableMap.Builder<Holder<UpgradeOrbType>, Integer> map = ImmutableMap.builder();
             map.put(upgradeType, 1);
             var upgrade = new UpgradeData(map.build(), slot);
             stack.set(UPGRADE_DATA, upgrade);
             return upgrade;
         } else {
-            ImmutableMap.Builder<UpgradeType, Integer> map = ImmutableMap.builder();
+            ImmutableMap.Builder<Holder<UpgradeOrbType>, Integer> map = ImmutableMap.builder();
             if (this.upgrades.containsKey(upgradeType)) {
                 map.put(upgradeType, this.upgrades.get(upgradeType) + 1);
                 map.putAll(this.upgrades.entrySet().stream().filter(entry -> entry.getKey() != upgradeType).toList());
@@ -99,7 +94,7 @@ public record UpgradeData(ImmutableMap<UpgradeType, Integer> upgrades, String up
 
     public int getTotalUpgrades() {
         int count = 0;
-        for (ImmutableMap.Entry<UpgradeType, Integer> upgradeInstance : this.upgrades.entrySet()) {
+        for (ImmutableMap.Entry<Holder<UpgradeOrbType>, Integer> upgradeInstance : this.upgrades.entrySet()) {
             count += upgradeInstance.getValue();
         }
         return count;
@@ -108,11 +103,6 @@ public record UpgradeData(ImmutableMap<UpgradeType, Integer> upgrades, String up
     public String getUpgradedSlot() {
         return this.upgradedSlot;
     }
-
-    public Map<UpgradeType, Integer> getUpgrades() {
-        return this.upgrades;
-    }
-
 
     @Override
     public boolean equals(Object obj) {
