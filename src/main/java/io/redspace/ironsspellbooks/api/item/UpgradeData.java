@@ -44,7 +44,8 @@ public record UpgradeData(Map<Holder<UpgradeOrbType>, Integer> upgrades, String 
             Codec.unboundedMap(UpgradeOrbTypeRegistry.UPGRADE_ORB_REGISTRY_CODEC, Codec.INT).fieldOf(UPGRADES).forGetter(UpgradeData::upgrades)
     ).apply(builder, (slot, list) -> new UpgradeData(list, slot)));
 
-    public static final Codec<UpgradeData> DEPRECATED_CODEC = RecordCodecBuilder.create(builder -> builder.group(
+    @Deprecated(forRemoval = true)
+    private static final Codec<UpgradeData> DEPRECATED_CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf(SLOT).forGetter(UpgradeData::getUpgradedSlot),
             Codec.list(ELEMENT_CODEC).fieldOf(UPGRADES)
                     .forGetter(
@@ -52,18 +53,22 @@ public record UpgradeData(Map<Holder<UpgradeOrbType>, Integer> upgrades, String 
     ).apply(builder, (slot, list) -> new UpgradeData(parseCodec(list), slot)));
 
     public static final Codec<UpgradeData> CODEC = Codec.withAlternative(REAL_CODEC, Codec.of(
-            UpgradeData::encode,
-            UpgradeData::decode
+            UpgradeData::deprecatedEncodeWrapper,
+            UpgradeData::deprecatedDecodeWrapper
     ));
-
-    private static <T> DataResult<T> encode(final UpgradeData input, final DynamicOps<T> ops, final T prefix) {
+    @Deprecated(forRemoval = true) // holy scary...
+    private static <T> DataResult<T> deprecatedEncodeWrapper(final UpgradeData input, final DynamicOps<T> ops, final T prefix) {
         return DEPRECATED_CODEC.encode(input, ops, prefix);
     }
 
-    @Deprecated(forRemoval = true) // holy scary...
+    @Deprecated(forRemoval = true)
+    /**
+     * holy scary... temporarily store for decoding ops, so that a record-built-codec can access the ops, which usually doesnt have registry access, can now reference the static registry ops.
+     */
     private static DynamicOps<?> ops;
 
-    private static <T> DataResult<com.mojang.datafixers.util.Pair<UpgradeData, T>> decode(final DynamicOps<T> ops, final T input) {
+    @Deprecated(forRemoval = true)
+    private static <T> DataResult<com.mojang.datafixers.util.Pair<UpgradeData, T>> deprecatedDecodeWrapper(final DynamicOps<T> ops, final T input) {
         UpgradeData.ops = ops;
         var result = DEPRECATED_CODEC.decode(ops, input);
         UpgradeData.ops = null;
