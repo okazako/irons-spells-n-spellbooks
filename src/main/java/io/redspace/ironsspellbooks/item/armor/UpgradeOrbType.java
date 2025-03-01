@@ -38,18 +38,4 @@ public record UpgradeOrbType(
             type -> type.containerItem,
             UpgradeOrbType::new
     );
-
-    @Override
-    public int hashCode() {
-        try {
-            return attribute.getKey().hashCode() * 31 * 31 * 31 + ((int) amount) * 31 * 31 + operation.id() * 31 + containerItem.map(holder -> holder.getKey().hashCode()).orElse(0);
-        } catch (NullPointerException e) {
-            return 0;
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof UpgradeOrbType other && attribute.equals(other.attribute) && amount == other.amount && operation == other.operation && containerItem.equals(other.containerItem);
-    }
 }
